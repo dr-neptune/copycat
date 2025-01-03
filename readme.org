@@ -25,8 +25,8 @@ If you use `use-package`, add something like this to your Emacs config:
 (use-package copycat
   :load-path "/path/to/copycat"  ;; Adjust to your local path
   :commands (copycat copycat-copy-marked)
-  :bind (("C-c d c" . copycat)               ;; Open Dired with filtered files
-         ("C-c d m" . copycat-copy-marked))  ;; Copy marked files into Org buffer
+  :bind (("C-c c" . copycat)               ;; Open Dired with filtered files
+         ("C-c m" . copycat-copy-marked))  ;; Copy marked files into Org buffer
   :config
   ;; Example: show absolute paths in the Org buffer
   (setq copycat-use-absolute-paths t))
