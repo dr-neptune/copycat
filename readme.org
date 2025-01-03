@@ -1,0 +1,92 @@
+#+TITLE: Copycat 😺
+
+* Introduction 😻
+Copycat is a minimal Emacs package that lets you easily copy the contents of multiple
+files into an Org buffer. It filters which files appear in Dired and optionally allows you to collapse directories with `dired-subtree`.
+
+* Key Features 😸
+- *Mark & Copy Multiple Files*: Select files in Dired, run a single command,
+  and see them all gathered in an Org buffer.
+- *Org Babel Blocks*: Automatically wrap code in `#+BEGIN_SRC LANG` blocks
+  if you’ve set up extension→language mappings.
+- *Filtered File Listing*: Only show the extensions you care about; hide
+  dotfiles by default.
+- *Collapsible Directories*: Integrates with `dired-subtree` so you can
+  expand/collapse folders with `<tab>`.
+- *Absolute or Filename-Only Paths*: Decide whether to show the entire path
+  or just the filename in the “FILE:” heading.
+
+* Installation & Usage 🙀
+
+** Using use-package
+If you use `use-package`, add something like this to your Emacs config:
+
+#+BEGIN_SRC emacs-lisp
+(use-package copycat
+  :load-path "/path/to/copycat"  ;; Adjust to your local path
+  :commands (copycat copycat-copy-marked)
+  :bind (("C-c d c" . copycat)               ;; Open Dired with filtered files
+         ("C-c d m" . copycat-copy-marked))  ;; Copy marked files into Org buffer
+  :config
+  ;; Example: show absolute paths in the Org buffer
+  (setq copycat-use-absolute-paths t))
+#+END_SRC
+
+Steps:
+1. *Clone* or place `copycat.el` in the path specified by `:load-path`.
+2. *Restart* or **reload** Emacs.
+3. *Invoke* `M-x copycat` to select a directory and open a filtered Dired.
+4. *Mark files* by pressing m in their region and run `M-x copycat-copy-marked` to gather their contents
+   in `*copycat-output*` (Org mode).
+
+* Configuration 😾
+
+** Allowed Extensions
+By default, Copycat shows files with these extensions:
+`py, ts, tsx, js, jsx, yaml, md, org`.
+
+Change them via:
+#+BEGIN_SRC emacs-lisp
+M-x customize-variable RET copycat-allowed-extensions
+#+END_SRC
+Or directly:
+#+BEGIN_SRC emacs-lisp
+(setq copycat-allowed-extensions '("py" "rb" "org"))
+#+END_SRC
+
+** Extension → Org Babel Language
+Copycat uses `copycat-extension-to-lang` to map extensions to Org Babel
+languages, for example:
+#+BEGIN_SRC emacs-lisp
+(("py"   . "python")
+ ("js"   . "javascript")
+ ("tsx"  . "typescript")
+ ("md"   . "markdown")
+ ("org"  . "org"))
+#+END_SRC
+
+Customize via:
+#+BEGIN_SRC emacs-lisp
+M-x customize-variable RET copycat-extension-to-lang
+#+END_SRC
+
+Or edit in your config:
+#+BEGIN_SRC emacs-lisp
+(setf (alist-get "rb" copycat-extension-to-lang) "ruby")
+#+END_SRC
+
+If an extension isn’t found, Copycat inserts a generic `#+BEGIN_SRC` block.
+
+** Absolute vs. Filename-Only Paths
+To show full paths in the Org buffer, set:
+#+BEGIN_SRC emacs-lisp
+(setq copycat-use-absolute-paths t)
+#+END_SRC
+Or:
+#+BEGIN_SRC emacs-lisp
+M-x customize-variable RET copycat-use-absolute-paths
+#+END_SRC
+
+* Contributing 😽
+Feel free to send feedback, file issues, or open pull requests with bug fixes or
+feature ideas. Enjoy Copycat, and may your multi-file editing be smooth!
