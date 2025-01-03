@@ -28,6 +28,12 @@
   :type '(alist :key-type string :value-type string)
   :group 'copycat)
 
+(defcustom copycat-use-absolute-paths nil
+  "If non-nil, insert absolute file paths in the Org buffer headings.
+If nil, only the filename (no directories) is displayed."
+  :type 'boolean
+  :group 'copycat)
+
 (defun copycat--detect-lang (ext)
   "Return an Org Babel language name for the file extension EXT.
 Return an empty string if EXT is not found in `copycat-extension-to-lang`."
@@ -37,7 +43,7 @@ Return an empty string if EXT is not found in `copycat-extension-to-lang`."
 (defun copycat (dir)
   "Open a Dired buffer in DIR, showing only user-defined allowed files, with subtree toggling."
   (interactive "DSelect directory: ")
-  (let* ((default-directory (file-name-as-directory (expand-file-name dir))))
+  (let ((default-directory (file-name-as-directory (expand-file-name dir))))
     (dired default-directory)
     ;; Hide dotfiles by default:
     (dired-omit-mode 1)
@@ -64,15 +70,19 @@ Return an empty string if EXT is not found in `copycat-extension-to-lang`."
                                       (insert-file-contents-literally f)
                                       (replace-regexp-in-string "\r" "" (buffer-string))))
                      (ext  (file-name-extension f))
-                     (lang (copycat--detect-lang ext)))
-                (insert (format "* FILE: %s\n" (file-name-nondirectory f)))
+                     (lang (copycat--detect-lang ext))
+                     ;; Decide how we display the file path:
+                     (file-heading (if copycat-use-absolute-paths
+                                       (expand-file-name f)
+                                     (file-name-nondirectory f))))
+                (insert (format "* FILE: %s\n" file-heading))
                 (if (string-empty-p lang)
                     (insert "#+BEGIN_SRC\n")  ;; No language => fallback
                   (insert (format "#+BEGIN_SRC %s\n" lang)))
                 (insert file-contents)
                 (insert "#+END_SRC\n\n")
                 (setq contents (concat contents
-                                       (file-name-nondirectory f) "\n"
+                                       file-heading "\n"
                                        file-contents "\n")))))
           (goto-char (point-min)))
         (kill-new contents)
